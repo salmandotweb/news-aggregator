@@ -127,26 +127,31 @@ export const fetchArticles = createAsyncThunk(
          }
 
          if (sources.includes('The Guardian')) {
-            const guardianArticles = await fetchGuardianArticles(
+            const guardianResult = await fetchGuardianArticles(
                searchQuery,
+               currentPage,
                selectedCategory
             );
-            articles = sources.includes('NewsAPI') ? [...articles, ...guardianArticles] : guardianArticles;
+            articles = sources.includes('NewsAPI')
+               ? [...articles, ...guardianResult.articles]
+               : guardianResult.articles;
             if (!sources.includes('NewsAPI')) {
-               totalResults = guardianArticles.length;
+               totalResults = guardianResult.totalResults;
             }
          }
 
          if (sources.includes('New York Times')) {
             const nyTimesArticles = await fetchNYTimesArticles(
                searchQuery,
-               selectedCategory
+               selectedCategory,
+               currentPage
             );
             articles = sources.includes('NewsAPI') || sources.includes('The Guardian')
-               ? [...articles, ...nyTimesArticles]
-               : nyTimesArticles;
+               ? [...articles, ...nyTimesArticles.articles]
+               : nyTimesArticles.articles;
+
             if (!sources.includes('NewsAPI') && !sources.includes('The Guardian')) {
-               totalResults = nyTimesArticles.length;
+               totalResults = nyTimesArticles.totalResults;
             }
          }
 
@@ -164,9 +169,11 @@ export const fetchArticles = createAsyncThunk(
             return [];
          }
 
-         const hasMoreArticles = sources.includes('NewsAPI')
+         const hasMoreArticles = sources.includes('NewsAPI') || sources.includes('The Guardian')
             ? currentPage * ARTICLES_PER_PAGE < totalResults
-            : false;
+            : sources.includes('New York Times')
+               ? currentPage * ARTICLES_PER_PAGE < totalResults
+               : false;
 
          dispatch(setHasMore(hasMoreArticles));
          dispatch(setArticles({ page: currentPage, articles }));
@@ -176,7 +183,6 @@ export const fetchArticles = createAsyncThunk(
          return articles;
       } catch (error) {
          dispatch(setLoading(false));
-         dispatch(setError((error as Error).message));
          throw error;
       }
    }

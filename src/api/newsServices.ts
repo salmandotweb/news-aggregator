@@ -12,6 +12,11 @@ export interface NewsAPIResult {
    totalResults: number;
 }
 
+export interface GuardianResult {
+   articles: Article[];
+   totalResults: number;
+}
+
 export const fetchNewsAPIArticles = async (
    query: string,
    page: number,
@@ -56,10 +61,11 @@ export const fetchNewsAPIArticles = async (
 
 export const fetchGuardianArticles = async (
    query: string,
+   page: number,
    category?: string
-): Promise<Article[]> => {
+): Promise<GuardianResult> => {
    try {
-      const endpoint = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}${category ? `&section=${category}` : ''}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`;
+      const endpoint = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}${category ? `&section=${category}` : ''}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page=${page}&page-size=${ARTICLES_PER_PAGE}&order-by=newest`;
 
       const response = await axios.get<GuardianResponse>(endpoint);
 
@@ -67,7 +73,7 @@ export const fetchGuardianArticles = async (
          throw new Error('Guardian API response not ok');
       }
 
-      return response.data.response.results
+      const articles = response.data.response.results
          .filter(article => article.fields?.thumbnail)
          .map(article => ({
             id: article.id,
@@ -80,6 +86,11 @@ export const fetchGuardianArticles = async (
             imageUrl: article.fields?.thumbnail || '',
             category: article.sectionName
          }));
+
+      return {
+         articles,
+         totalResults: response.data.response.total
+      };
    } catch (error) {
       console.error('Guardian API Error:', error);
       throw new Error('Failed to fetch from Guardian API');
@@ -88,16 +99,17 @@ export const fetchGuardianArticles = async (
 
 export const fetchNYTimesArticles = async (
    query: string,
-   category?: string
-): Promise<Article[]> => {
+   category?: string,
+   page: number = 1
+): Promise<{ articles: Article[], totalResults: number }> => {
    try {
       const endpoint =
-         `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(query)}${category ? `&fq=news_desk:(${category})` : ''}&api-key=${NYTIMES_API_KEY}`
+         `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(query)}${category ? `&fq=news_desk:(${category})` : ''}&page=${page - 1}&api-key=${NYTIMES_API_KEY}`;
 
       const response = await axios.get<NYTimesResponse>(endpoint);
 
       if ('response' in response.data) {
-         return response.data.response.docs
+         const articles = response.data.response.docs
             .filter(article => article.multimedia?.[0]?.url)
             .map(article => ({
                id: article.web_url,
@@ -111,21 +123,17 @@ export const fetchNYTimesArticles = async (
                   `https://www.nytimes.com/${article.multimedia[0].url}` : '',
                category: undefined
             }));
-      } else {
-         return response.data.results
-            .filter(article => article.multimedia?.[0]?.url)
-            .map(article => ({
-               id: article.url,
-               title: article.title,
-               description: article.abstract || '',
-               source: 'New York Times',
-               author: article.byline || undefined,
-               publishedAt: article.published_date,
-               url: article.url,
-               imageUrl: article.multimedia?.[0]?.url || '',
-               category: article.section
-            }));
+
+         return {
+            articles,
+            totalResults: response.data.response.meta?.hits || 0
+         };
       }
+
+      return {
+         articles: [],
+         totalResults: 0
+      };
    } catch (error) {
       console.error('NY Times API Error:', error);
       throw new Error('Failed to fetch from NY Times API');

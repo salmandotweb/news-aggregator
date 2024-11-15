@@ -70,8 +70,34 @@ export interface GuardianResponse {
    };
 }
 
-export interface NYTimesTopStoriesResponse {
+// First, let's create a base interface for the common properties
+interface NYTimesResponseBase {
    status: string;
+}
+
+// Interface for article search response
+export interface NYTimesArticleSearchResponse extends NYTimesResponseBase {
+   response: {
+      docs: Array<{
+         web_url: string;
+         headline: { main: string };
+         abstract: string;
+         byline?: { original: string };
+         pub_date: string;
+         multimedia?: Array<{
+            url: string;
+         }>;
+      }>;
+      meta?: {
+         hits: number;
+         offset: number;
+         time: number;
+      };
+   };
+}
+
+// Keep the existing NYTimesTopStoriesResponse
+export interface NYTimesTopStoriesResponse extends NYTimesResponseBase {
    results: Array<{
       url: string;
       title: string;
@@ -86,20 +112,8 @@ export interface NYTimesTopStoriesResponse {
    }>;
 }
 
-export type NYTimesResponse = {
-   response: {
-      docs: Array<{
-         web_url: string;
-         headline: { main: string };
-         abstract: string;
-         byline?: { original: string };
-         pub_date: string;
-         multimedia?: Array<{
-            url: string;
-         }>;
-      }>;
-   };
-} | NYTimesTopStoriesResponse;
+// Define NYTimesResponse as a type union of the two possible response types
+export type NYTimesResponse = NYTimesArticleSearchResponse | NYTimesTopStoriesResponse;
 
 export interface APIErrorResponse {
    status: string;
