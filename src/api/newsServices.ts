@@ -29,7 +29,8 @@ export const fetchNewsAPIArticles = async (
             article.title &&
             article.title !== '[Removed]' &&
             article.description &&
-            article.description !== '[Removed]'
+            article.description !== '[Removed]' &&
+            article.urlToImage
          )
          .map(article => ({
             id: article.url,
@@ -39,7 +40,7 @@ export const fetchNewsAPIArticles = async (
             author: article.author || undefined,
             publishedAt: article.publishedAt,
             url: article.url,
-            imageUrl: article.urlToImage || undefined,
+            imageUrl: article.urlToImage || '',
             category: category ? category.charAt(0).toUpperCase() + category.slice(1) : undefined
          }));
 
@@ -66,17 +67,19 @@ export const fetchGuardianArticles = async (
          throw new Error('Guardian API response not ok');
       }
 
-      return response.data.response.results.map(article => ({
-         id: article.id,
-         title: article.webTitle,
-         description: article.fields?.bodyText?.substring(0, 200) || '',
-         source: 'The Guardian',
-         author: undefined,
-         publishedAt: article.webPublicationDate,
-         url: article.webUrl,
-         imageUrl: article.fields?.thumbnail,
-         category: article.sectionName
-      }));
+      return response.data.response.results
+         .filter(article => article.fields?.thumbnail)
+         .map(article => ({
+            id: article.id,
+            title: article.webTitle,
+            description: article.fields?.bodyText?.substring(0, 200) || '',
+            source: 'The Guardian',
+            author: undefined,
+            publishedAt: article.webPublicationDate,
+            url: article.webUrl,
+            imageUrl: article.fields?.thumbnail || '',
+            category: article.sectionName
+         }));
    } catch (error) {
       console.error('Guardian API Error:', error);
       throw new Error('Failed to fetch from Guardian API');
@@ -94,31 +97,34 @@ export const fetchNYTimesArticles = async (
       const response = await axios.get<NYTimesResponse>(endpoint);
 
       if ('response' in response.data) {
-         return response.data.response.docs.map(article => ({
-            id: article.web_url,
-            title: article.headline.main,
-            description: article.abstract || '',
-            source: 'New York Times',
-            author: article.byline?.original || undefined,
-            publishedAt: article.pub_date,
-            url: article.web_url,
-            imageUrl: article.multimedia?.[0]?.url
-               ? `https://www.nytimes.com/${article.multimedia[0].url}`
-               : undefined,
-            category: undefined
-         }));
+         return response.data.response.docs
+            .filter(article => article.multimedia?.[0]?.url)
+            .map(article => ({
+               id: article.web_url,
+               title: article.headline.main,
+               description: article.abstract || '',
+               source: 'New York Times',
+               author: article.byline?.original || undefined,
+               publishedAt: article.pub_date,
+               url: article.web_url,
+               imageUrl: article.multimedia?.[0]?.url ?
+                  `https://www.nytimes.com/${article.multimedia[0].url}` : '',
+               category: undefined
+            }));
       } else {
-         return response.data.results.map(article => ({
-            id: article.url,
-            title: article.title,
-            description: article.abstract || '',
-            source: 'New York Times',
-            author: article.byline || undefined,
-            publishedAt: article.published_date,
-            url: article.url,
-            imageUrl: article.multimedia?.[0]?.url || undefined,
-            category: article.section
-         }));
+         return response.data.results
+            .filter(article => article.multimedia?.[0]?.url)
+            .map(article => ({
+               id: article.url,
+               title: article.title,
+               description: article.abstract || '',
+               source: 'New York Times',
+               author: article.byline || undefined,
+               publishedAt: article.published_date,
+               url: article.url,
+               imageUrl: article.multimedia?.[0]?.url || '',
+               category: article.section
+            }));
       }
    } catch (error) {
       console.error('NY Times API Error:', error);
