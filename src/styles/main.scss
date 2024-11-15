@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Outfit:wght@100..900&display=swap");
+
 @import "variables";
 @import "mixins";
 
@@ -6,6 +8,7 @@
 	background-color: var(--bg-color);
 	color: var(--text-color);
 	transition: background-color 0.3s, color 0.3s;
+	font-family: "Outfit", sans-serif;
 
 	&.light {
 		--bg-color: #{$background-color};
