@@ -2,18 +2,26 @@
 @import "../../styles/mixins";
 
 .filter-panel {
+	background-color: var(--card-bg);
+	border-radius: 1rem;
+	border: 1px solid var(--border-color);
+	padding: 1.25rem;
+
 	h2 {
-		margin-bottom: 1.5rem;
-		color: $secondary-color;
+		margin-bottom: 1.25rem;
+		color: var(--text-color);
+		font-size: 1.25rem;
+		font-weight: 600;
 	}
 
 	.filter-section {
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 
 		h3 {
-			margin-bottom: 1rem;
-			font-size: 1.1rem;
-			color: $text-color;
+			margin-bottom: 0.75rem;
+			font-size: 1rem;
+			color: var(--text-color);
+			font-weight: 500;
 		}
 	}
 
@@ -21,10 +29,18 @@
 		display: flex;
 		align-items: center;
 		margin-bottom: 0.5rem;
+		padding: 0.25rem 0;
 		cursor: pointer;
+		color: var(--text-color);
+		opacity: 0.9;
 
 		input[type="checkbox"] {
 			margin-right: 0.5rem;
+			cursor: pointer;
+		}
+
+		&:hover {
+			opacity: 1;
 		}
 	}
 }
