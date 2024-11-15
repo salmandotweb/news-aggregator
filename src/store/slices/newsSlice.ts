@@ -24,7 +24,7 @@ const initialState: NewsState = {
       startDate: undefined,
       endDate: undefined,
       categories: [],
-      sources: [],
+      sources: ['NewsAPI'],
       authors: []
    }
 };
@@ -66,16 +66,18 @@ export const fetchArticles = createAsyncThunk(
          const { news } = getState() as RootState;
          const { searchQuery, sources } = news.filters;
 
+         const query = searchQuery || 'latest news';
+
          const promises = [];
 
          if (sources.includes('NewsAPI')) {
-            promises.push(fetchNewsAPIArticles(searchQuery));
+            promises.push(fetchNewsAPIArticles(query));
          }
          if (sources.includes('The Guardian')) {
-            promises.push(fetchGuardianArticles(searchQuery));
+            promises.push(fetchGuardianArticles(query));
          }
          if (sources.includes('New York Times')) {
-            promises.push(fetchNYTimesArticles(searchQuery));
+            promises.push(fetchNYTimesArticles(query));
          }
 
          const results = await Promise.all(promises);

@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { fetchArticles } from "./store/slices/newsSlice";
 import { usePreferences } from "./hooks/usePreferences";
 import SearchBar from "./components/searchBar/searchBar";
 import FilterPanel from "./components/filterPanel/filterPanel";
 import NewsFeed from "./components/newsFeed/newsFeed";
 import ErrorBoundary from "./components/errorBoundary";
 import LoadingSpinner from "./components/loadingSpinner";
-import { useSelector } from "react-redux";
 import { RootState } from "./store/store";
 import "./styles/main.scss";
+import { useAppDispatch } from "./store/store";
 
 const App: React.FC = () => {
+	const dispatch = useAppDispatch();
 	const { theme } = usePreferences();
 	const { loading, error } = useSelector((state: RootState) => state.news);
+
+	useEffect(() => {
+		// Fetch articles when the app loads
+		dispatch(fetchArticles());
+	}, [dispatch]);
 
 	return (
 		<div className={`app ${theme}`}>
