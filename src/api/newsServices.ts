@@ -51,9 +51,11 @@ export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<New
 
 export const fetchGuardianArticles = async (query: string): Promise<Article[]> => {
    try {
-      const response = await axios.get<GuardianResponse>(
-         `https://content.guardianapis.com/search?q=${query}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`
-      );
+      const endpoint = query
+         ? `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`
+         : `https://content.guardianapis.com/search?api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`;
+
+      const response = await axios.get<GuardianResponse>(endpoint);
 
       if (response.data.response.status !== 'ok') {
          throw new Error('Guardian API response not ok');
@@ -78,24 +80,41 @@ export const fetchGuardianArticles = async (query: string): Promise<Article[]> =
 
 export const fetchNYTimesArticles = async (query: string): Promise<Article[]> => {
    try {
-      const response = await axios.get<NYTimesResponse>(
-         `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${query}&api-key=${NYTIMES_API_KEY}`
-      );
+      const endpoint = query
+         ? `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(query)}&api-key=${NYTIMES_API_KEY}`
+         : `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${NYTIMES_API_KEY}`;
 
-      return response.data.response.docs.map(article => ({
-         id: article.web_url,
-         title: article.headline.main,
-         description: article.abstract || '',
-         source: 'New York Times',
-         author: article.byline?.original || undefined,
-         publishedAt: article.pub_date,
-         url: article.web_url,
-         imageUrl: article.multimedia?.[0]?.url
-            ? `https://www.nytimes.com/${article.multimedia[0].url}`
-            : undefined,
-         category: undefined
-      }));
+      const response = await axios.get<NYTimesResponse>(endpoint);
+
+      if ('response' in response.data) {
+         return response.data.response.docs.map(article => ({
+            id: article.web_url,
+            title: article.headline.main,
+            description: article.abstract || '',
+            source: 'New York Times',
+            author: article.byline?.original || undefined,
+            publishedAt: article.pub_date,
+            url: article.web_url,
+            imageUrl: article.multimedia?.[0]?.url
+               ? `https://www.nytimes.com/${article.multimedia[0].url}`
+               : undefined,
+            category: undefined
+         }));
+      } else {
+         return response.data.results.map(article => ({
+            id: article.url,
+            title: article.title,
+            description: article.abstract || '',
+            source: 'New York Times',
+            author: article.byline || undefined,
+            publishedAt: article.published_date,
+            url: article.url,
+            imageUrl: article.multimedia?.[0]?.url || undefined,
+            category: article.section
+         }));
+      }
    } catch (error) {
+      console.error('NY Times API Error:', error);
       throw new Error('Failed to fetch from NY Times API');
    }
 };

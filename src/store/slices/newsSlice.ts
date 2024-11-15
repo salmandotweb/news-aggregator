@@ -82,6 +82,16 @@ export const {
    clearArticlesCache
 } = newsSlice.actions;
 
+export const updateSource = createAsyncThunk(
+   'news/updateSource',
+   async (sources: string[], { dispatch }) => {
+      dispatch(clearArticlesCache());
+      dispatch(setCurrentPage(1));
+      dispatch(updateFilters({ sources }));
+      return dispatch(fetchArticles()).unwrap();
+   }
+);
+
 export const fetchArticles = createAsyncThunk(
    'news/fetchArticles',
    async (_, { getState, dispatch }) => {
@@ -108,26 +118,37 @@ export const fetchArticles = createAsyncThunk(
             const newsAPIResult = await fetchNewsAPIArticles(searchQuery, currentPage);
             articles = newsAPIResult.articles;
             totalResults = newsAPIResult.totalResults;
-
-            if (articles.length === 0 && currentPage > 1) {
-               dispatch(setCurrentPage(currentPage - 1));
-               dispatch(setHasMore(false));
-               dispatch(setLoading(false));
-               return;
-            }
-
-            const hasMoreArticles = currentPage * ARTICLES_PER_PAGE < totalResults;
-            dispatch(setHasMore(hasMoreArticles));
          }
+
          if (sources.includes('The Guardian')) {
-            const guardianArticles = await fetchGuardianArticles(searchQuery || 'news');
-            articles = [...articles, ...guardianArticles];
-         }
-         if (sources.includes('New York Times')) {
-            const nyTimesArticles = await fetchNYTimesArticles(searchQuery || 'news');
-            articles = [...articles, ...nyTimesArticles];
+            const guardianArticles = await fetchGuardianArticles(searchQuery);
+            articles = sources.includes('NewsAPI') ? [...articles, ...guardianArticles] : guardianArticles;
+            if (!sources.includes('NewsAPI')) {
+               totalResults = guardianArticles.length;
+            }
          }
 
+         if (sources.includes('New York Times')) {
+            const nyTimesArticles = await fetchNYTimesArticles(searchQuery);
+            articles = sources.includes('NewsAPI') || sources.includes('The Guardian')
+               ? [...articles, ...nyTimesArticles]
+               : nyTimesArticles;
+            if (!sources.includes('NewsAPI') && !sources.includes('The Guardian')) {
+               totalResults = nyTimesArticles.length;
+            }
+         }
+
+         if (articles.length === 0) {
+            dispatch(setHasMore(false));
+            dispatch(setLoading(false));
+            return [];
+         }
+
+         const hasMoreArticles = sources.includes('NewsAPI')
+            ? currentPage * ARTICLES_PER_PAGE < totalResults
+            : false;
+
+         dispatch(setHasMore(hasMoreArticles));
          dispatch(setArticles({ page: currentPage, articles }));
          dispatch(setTotalResults(totalResults));
          dispatch(setLoading(false));

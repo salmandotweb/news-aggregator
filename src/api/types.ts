@@ -70,29 +70,36 @@ export interface GuardianResponse {
    };
 }
 
-export interface NYTimesResponse {
+export interface NYTimesTopStoriesResponse {
    status: string;
+   results: Array<{
+      url: string;
+      title: string;
+      abstract: string;
+      byline: string;
+      published_date: string;
+      section: string;
+      multimedia?: Array<{
+         url: string;
+         type: string;
+      }>;
+   }>;
+}
+
+export type NYTimesResponse = {
    response: {
       docs: Array<{
-         abstract: string;
          web_url: string;
-         snippet: string;
-         lead_paragraph: string;
-         source: string;
-         multimedia: Array<{
-            url: string;
-            type: string;
-         }>;
-         headline: {
-            main: string;
-         };
+         headline: { main: string };
+         abstract: string;
+         byline?: { original: string };
          pub_date: string;
-         byline: {
-            original: string | null;
-         };
+         multimedia?: Array<{
+            url: string;
+         }>;
       }>;
    };
-}
+} | NYTimesTopStoriesResponse;
 
 export interface APIErrorResponse {
    status: string;
