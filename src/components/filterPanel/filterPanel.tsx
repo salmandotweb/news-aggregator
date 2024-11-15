@@ -61,7 +61,7 @@ const FilterPanel: React.FC = () => {
 							checked={filters.categories.includes(category)}
 							onChange={() => handleCategoryChange(category)}
 						/>
-						{category}
+						<span>{category}</span>
 					</label>
 				))}
 			</section>
@@ -75,7 +75,7 @@ const FilterPanel: React.FC = () => {
 							checked={filters.sources.includes(source)}
 							onChange={() => handleSourceChange(source)}
 						/>
-						{source}
+						<span>{source}</span>
 					</label>
 				))}
 			</section>

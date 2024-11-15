@@ -33,14 +33,70 @@
 		cursor: pointer;
 		color: var(--text-color);
 		opacity: 0.9;
+		position: relative;
 
 		input[type="checkbox"] {
-			margin-right: 0.5rem;
+			position: absolute;
+			opacity: 0;
 			cursor: pointer;
+			height: 0;
+			width: 0;
+
+			& + span {
+				position: relative;
+				padding-left: 36px;
+				cursor: pointer;
+				display: inline-block;
+				line-height: 20px;
+
+				&:before {
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 20px;
+					height: 20px;
+					border: 2px solid var(--border-color);
+					background: var(--bg-color);
+					border-radius: 4px;
+					transition: all 0.2s ease;
+				}
+
+				&:after {
+					content: "";
+					position: absolute;
+					left: 7px;
+					top: 3px;
+					width: 6px;
+					height: 11px;
+					border: solid $primary-color;
+					border-width: 0 2px 2px 0;
+					transform: rotate(45deg);
+					opacity: 0;
+					transition: all 0.2s ease;
+				}
+			}
+
+			&:checked + span:before {
+				border-color: $primary-color;
+				background: rgba($primary-color, 0.1);
+			}
+
+			&:checked + span:after {
+				opacity: 1;
+			}
+
+			&:focus + span:before {
+				box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+			}
 		}
 
 		&:hover {
 			opacity: 1;
+
+			span:before {
+				border-color: $primary-color;
+			}
 		}
 	}
 }
