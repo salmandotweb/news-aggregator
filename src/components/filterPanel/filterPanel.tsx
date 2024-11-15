@@ -9,7 +9,6 @@ import {
 } from "store/slices/newsSlice";
 import { useAppDispatch } from "store/store";
 import "./filterPanel.scss";
-import { Article } from "api/types";
 
 const CATEGORIES = [
 	"Business",
@@ -29,29 +28,19 @@ const FilterPanel: React.FC = () => {
 	// Get all articles, including the cached ones
 	const allArticles = useSelector((state: RootState) => {
 		const cachedArticles = Object.values(state.news.articles).flat();
-		// Store initial articles in ref to maintain the full author list
 		return cachedArticles;
 	});
 
-	// Keep track of initial articles to maintain full author list
-	const initialArticles = React.useRef<Article[]>([]);
-	React.useEffect(() => {
-		if (allArticles.length > 0 && initialArticles.current.length === 0) {
-			initialArticles.current = allArticles;
-		}
-	}, [allArticles]);
-
-	// Get unique authors from initial articles load
+	// Get unique authors from current articles
 	const uniqueAuthors = React.useMemo(() => {
-		const articles =
-			initialArticles.current.length > 0
-				? initialArticles.current
-				: allArticles;
-		const authors = articles
+		const authors = allArticles
 			.map((article) => article.author)
-			.filter((author): author is string => !!author); // Filter out undefined/null
+			.filter(
+				(author): author is string =>
+					typeof author === "string" && author.trim() !== ""
+			);
 		return Array.from(new Set(authors)).sort();
-	}, [allArticles, initialArticles.current]);
+	}, [allArticles]);
 
 	const handleCategoryChange = async (category: string) => {
 		const updatedCategories = filters.categories.includes(category)
@@ -138,19 +127,21 @@ const FilterPanel: React.FC = () => {
 				))}
 			</section>
 
-			<section className="filter-section">
+			<section className="filter-section authors-section">
 				<h3>Authors</h3>
 				{uniqueAuthors.length > 0 ? (
-					uniqueAuthors.map((author) => (
-						<label key={author} className="filter-option">
-							<input
-								type="checkbox"
-								checked={filters.authors.includes(author)}
-								onChange={() => handleAuthorChange(author)}
-							/>
-							<span>{author}</span>
-						</label>
-					))
+					<div className="authors-list">
+						{uniqueAuthors.map((author) => (
+							<label key={author} className="filter-option">
+								<input
+									type="checkbox"
+									checked={filters.authors.includes(author)}
+									onChange={() => handleAuthorChange(author)}
+								/>
+								<span>{author}</span>
+							</label>
+						))}
+					</div>
 				) : (
 					<p className="no-filters">
 						No authors available for current articles

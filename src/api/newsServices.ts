@@ -42,7 +42,7 @@ export const fetchNewsAPIArticles = async (
             title: article.title,
             description: article.description || '',
             source: 'NewsAPI',
-            author: article.author || undefined,
+            author: article.author && article.author.trim() !== '' ? article.author : undefined,
             publishedAt: article.publishedAt,
             url: article.url,
             imageUrl: article.urlToImage || '',
@@ -65,7 +65,7 @@ export const fetchGuardianArticles = async (
    category?: string
 ): Promise<GuardianResult> => {
    try {
-      const endpoint = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}${category ? `&section=${category}` : ''}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page=${page}&page-size=${ARTICLES_PER_PAGE}&order-by=newest`;
+      const endpoint = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}${category ? `&section=${category}` : ''}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline,byline&page=${page}&page-size=${ARTICLES_PER_PAGE}&order-by=newest`;
 
       const response = await axios.get<GuardianResponse>(endpoint);
 
@@ -80,7 +80,7 @@ export const fetchGuardianArticles = async (
             title: article.webTitle,
             description: article.fields?.bodyText?.substring(0, 200) || '',
             source: 'The Guardian',
-            author: undefined,
+            author: article.fields?.byline || undefined,
             publishedAt: article.webPublicationDate,
             url: article.webUrl,
             imageUrl: article.fields?.thumbnail || '',
@@ -116,7 +116,7 @@ export const fetchNYTimesArticles = async (
                title: article.headline.main,
                description: article.abstract || '',
                source: 'New York Times',
-               author: article.byline?.original || undefined,
+               author: article.byline?.original?.replace('By ', '') || undefined,
                publishedAt: article.pub_date,
                url: article.web_url,
                imageUrl: article.multimedia?.[0]?.url ?

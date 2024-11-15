@@ -86,6 +86,32 @@
 			padding: 0.5rem 0;
 			font-style: italic;
 		}
+
+		&.authors-section {
+			.authors-list {
+				max-height: 200px;
+				overflow-y: auto;
+				padding-right: 0.5rem;
+
+				&::-webkit-scrollbar {
+					width: 6px;
+				}
+
+				&::-webkit-scrollbar-track {
+					background: var(--bg-color);
+					border-radius: 3px;
+				}
+
+				&::-webkit-scrollbar-thumb {
+					background: var(--border-color);
+					border-radius: 3px;
+
+					&:hover {
+						background: $secondary-color;
+					}
+				}
+			}
+		}
 	}
 
 	.filter-option {

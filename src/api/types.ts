@@ -65,6 +65,7 @@ export interface GuardianResponse {
          fields?: {
             thumbnail?: string;
             bodyText?: string;
+            byline?: string;
          };
       }>;
    };
