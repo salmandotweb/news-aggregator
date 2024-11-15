@@ -9,6 +9,7 @@ import {
 } from "store/slices/newsSlice";
 import { useAppDispatch } from "store/store";
 import "./filterPanel.scss";
+import { Article } from "api/types";
 
 const CATEGORIES = [
 	"Business",
@@ -25,10 +26,37 @@ const FilterPanel: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const filters = useSelector((state: RootState) => state.news.filters);
 
+	// Get all articles, including the cached ones
+	const allArticles = useSelector((state: RootState) => {
+		const cachedArticles = Object.values(state.news.articles).flat();
+		// Store initial articles in ref to maintain the full author list
+		return cachedArticles;
+	});
+
+	// Keep track of initial articles to maintain full author list
+	const initialArticles = React.useRef<Article[]>([]);
+	React.useEffect(() => {
+		if (allArticles.length > 0 && initialArticles.current.length === 0) {
+			initialArticles.current = allArticles;
+		}
+	}, [allArticles]);
+
+	// Get unique authors from initial articles load
+	const uniqueAuthors = React.useMemo(() => {
+		const articles =
+			initialArticles.current.length > 0
+				? initialArticles.current
+				: allArticles;
+		const authors = articles
+			.map((article) => article.author)
+			.filter((author): author is string => !!author); // Filter out undefined/null
+		return Array.from(new Set(authors)).sort();
+	}, [allArticles, initialArticles.current]);
+
 	const handleCategoryChange = async (category: string) => {
 		const updatedCategories = filters.categories.includes(category)
 			? filters.categories.filter((c) => c !== category)
-			: [category];
+			: [...filters.categories, category];
 
 		dispatch(clearArticlesCache());
 		dispatch(updateFilters({ categories: updatedCategories }));
@@ -55,6 +83,16 @@ const FilterPanel: React.FC = () => {
 		await dispatch(fetchArticles());
 	};
 
+	const handleAuthorChange = async (author: string) => {
+		const updatedAuthors = filters.authors.includes(author)
+			? filters.authors.filter((a) => a !== author)
+			: [...filters.authors, author];
+
+		dispatch(clearArticlesCache());
+		dispatch(updateFilters({ authors: updatedAuthors }));
+		await dispatch(fetchArticles());
+	};
+
 	return (
 		<div className="filter-panel">
 			<div className="filter-header">
@@ -63,7 +101,9 @@ const FilterPanel: React.FC = () => {
 					className="reset-button"
 					onClick={handleResetFilters}
 					disabled={
-						filters.categories.length === 0 && filters.sources.length === 1
+						filters.categories.length === 0 &&
+						filters.sources.length === 1 &&
+						filters.authors.length === 0
 					}
 				>
 					Reset
@@ -96,6 +136,26 @@ const FilterPanel: React.FC = () => {
 						<span>{source}</span>
 					</label>
 				))}
+			</section>
+
+			<section className="filter-section">
+				<h3>Authors</h3>
+				{uniqueAuthors.length > 0 ? (
+					uniqueAuthors.map((author) => (
+						<label key={author} className="filter-option">
+							<input
+								type="checkbox"
+								checked={filters.authors.includes(author)}
+								onChange={() => handleAuthorChange(author)}
+							/>
+							<span>{author}</span>
+						</label>
+					))
+				) : (
+					<p className="no-filters">
+						No authors available for current articles
+					</p>
+				)}
 			</section>
 		</div>
 	);

@@ -163,6 +163,13 @@ export const fetchArticles = createAsyncThunk(
             );
          }
 
+         const { authors } = news.filters;
+         if (authors.length > 0) {
+            articles = articles.filter(article =>
+               article.author && authors.includes(article.author)
+            );
+         }
+
          if (articles.length === 0) {
             dispatch(setHasMore(false));
             dispatch(setLoading(false));

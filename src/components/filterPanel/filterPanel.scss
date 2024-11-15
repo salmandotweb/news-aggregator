@@ -79,6 +79,13 @@
 			color: var(--text-color);
 			font-weight: 500;
 		}
+
+		.no-filters {
+			color: $secondary-color;
+			font-size: 0.875rem;
+			padding: 0.5rem 0;
+			font-style: italic;
+		}
 	}
 
 	.filter-option {
