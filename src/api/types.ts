@@ -96,7 +96,6 @@ export interface NYTimesArticleSearchResponse extends NYTimesResponseBase {
    };
 }
 
-// Keep the existing NYTimesTopStoriesResponse
 export interface NYTimesTopStoriesResponse extends NYTimesResponseBase {
    results: Array<{
       url: string;
@@ -112,7 +111,6 @@ export interface NYTimesTopStoriesResponse extends NYTimesResponseBase {
    }>;
 }
 
-// Define NYTimesResponse as a type union of the two possible response types
 export type NYTimesResponse = NYTimesArticleSearchResponse | NYTimesTopStoriesResponse;
 
 export interface APIErrorResponse {
