@@ -13,7 +13,7 @@ import { useAppDispatch } from "./store/store";
 
 const App: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { theme } = usePreferences();
+	const { theme, toggleTheme } = usePreferences();
 	const { loading, error } = useSelector((state: RootState) => state.news);
 
 	useEffect(() => {
@@ -26,8 +26,23 @@ const App: React.FC = () => {
 		<div className={`app ${theme}`}>
 			<header className="app-header">
 				<div className="header-content">
-					<h1>News Aggregator</h1>
+					<div className="brand">
+						<h1>
+							News<span>Aggregator</span>
+						</h1>
+					</div>
+
 					<SearchBar />
+
+					<div className="header-actions">
+						<button
+							className="theme-toggle"
+							onClick={toggleTheme}
+							aria-label="Toggle theme"
+						>
+							{theme === "light" ? "🌙" : "☀️"}
+						</button>
+					</div>
 				</div>
 			</header>
 
@@ -39,7 +54,6 @@ const App: React.FC = () => {
 
 					<section className="app-content">
 						{error && <div className="error-message">{error}</div>}
-
 						{loading ? <LoadingSpinner /> : <NewsFeed />}
 					</section>
 				</ErrorBoundary>
