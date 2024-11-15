@@ -9,6 +9,7 @@
 	color: var(--text-color);
 	transition: background-color 0.3s, color 0.3s;
 	font-family: "Outfit", sans-serif;
+	padding: 0 !important;
 
 	&.light {
 		--bg-color: #{$background-color};
@@ -126,4 +127,8 @@
 		padding: 3rem 1rem;
 		color: var(--text-color);
 	}
+}
+
+body {
+	margin: 0 !important;
 }
