@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { debounce } from "lodash";
-import { updateFilters } from "store/slices/newsSlice";
+import { updateFilters, clearArticlesCache } from "store/slices/newsSlice";
 import "./searchBar.scss";
 
 const SearchBar: React.FC = () => {
@@ -10,6 +10,7 @@ const SearchBar: React.FC = () => {
 
 	const debouncedSearch = useCallback(
 		debounce((value: string) => {
+			dispatch(clearArticlesCache());
 			dispatch(updateFilters({ searchQuery: value }));
 		}, 500),
 		[dispatch]

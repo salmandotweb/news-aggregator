@@ -10,7 +10,7 @@ import {
 import { RootState } from 'store/store';
 
 interface NewsState {
-   articles: Article[];
+   articles: { [page: number]: Article[] };
    loading: boolean;
    error: string | null;
    filters: NewsFilters;
@@ -20,7 +20,7 @@ interface NewsState {
 }
 
 const initialState: NewsState = {
-   articles: [],
+   articles: {},
    loading: false,
    error: null,
    filters: {
@@ -40,8 +40,8 @@ const newsSlice = createSlice({
    name: 'news',
    initialState,
    reducers: {
-      setArticles(state, action: PayloadAction<Article[]>) {
-         state.articles = action.payload;
+      setArticles(state, action: PayloadAction<{ page: number; articles: Article[] }>) {
+         state.articles[action.payload.page] = action.payload.articles;
       },
       setLoading(state, action: PayloadAction<boolean>) {
          state.loading = action.payload;
@@ -63,6 +63,9 @@ const newsSlice = createSlice({
       },
       setHasMore(state, action: PayloadAction<boolean>) {
          state.hasMore = action.payload;
+      },
+      clearArticlesCache(state) {
+         state.articles = {};
       }
    }
 });
@@ -75,7 +78,8 @@ export const {
    clearFilters,
    setCurrentPage,
    setTotalResults,
-   setHasMore
+   setHasMore,
+   clearArticlesCache
 } = newsSlice.actions;
 
 export const fetchArticles = createAsyncThunk(
@@ -83,6 +87,11 @@ export const fetchArticles = createAsyncThunk(
    async (_, { getState, dispatch }) => {
       try {
          const { news } = getState() as RootState;
+         const { currentPage } = news;
+
+         if (news.articles[currentPage]?.length > 0) {
+            return news.articles[currentPage];
+         }
 
          if (news.loading) {
             return;
@@ -92,7 +101,6 @@ export const fetchArticles = createAsyncThunk(
          dispatch(setError(null));
 
          const { searchQuery, sources } = news.filters;
-         const { currentPage } = news;
          let articles: Article[] = [];
          let totalResults = 0;
 
@@ -120,7 +128,7 @@ export const fetchArticles = createAsyncThunk(
             articles = [...articles, ...nyTimesArticles];
          }
 
-         dispatch(setArticles(articles));
+         dispatch(setArticles({ page: currentPage, articles }));
          dispatch(setTotalResults(totalResults));
          dispatch(setLoading(false));
 
@@ -133,19 +141,17 @@ export const fetchArticles = createAsyncThunk(
    }
 );
 
-// New action to handle page changes
 export const changePage = createAsyncThunk(
    'news/changePage',
    async (page: number, { dispatch, getState }) => {
       const { news } = getState() as RootState;
 
-      // Don't allow going to next page if there are no more results
       if (page > news.currentPage && !news.hasMore) {
          return;
       }
 
       dispatch(setCurrentPage(page));
-      return dispatch(fetchArticles());
+      return dispatch(fetchArticles()).unwrap();
    }
 );
 

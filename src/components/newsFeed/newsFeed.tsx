@@ -9,7 +9,12 @@ import { useAppDispatch } from "../../store/store";
 const NewsFeed: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { articles, loading, currentPage, hasMore } = useSelector(
-		(state: RootState) => state.news
+		(state: RootState) => ({
+			articles: state.news.articles[state.news.currentPage] || [],
+			loading: state.news.loading,
+			currentPage: state.news.currentPage,
+			hasMore: state.news.hasMore,
+		})
 	);
 
 	if (articles.length === 0) {

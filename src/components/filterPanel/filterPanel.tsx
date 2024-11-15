@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/store";
-import { updateFilters } from "store/slices/newsSlice";
+import { updateFilters, clearArticlesCache } from "store/slices/newsSlice";
 import "./filterPanel.scss";
 
 const CATEGORIES = [
@@ -24,6 +24,7 @@ const FilterPanel: React.FC = () => {
 			? filters.categories.filter((c) => c !== category)
 			: [...filters.categories, category];
 
+		dispatch(clearArticlesCache());
 		dispatch(updateFilters({ categories: updatedCategories }));
 	};
 
@@ -32,6 +33,7 @@ const FilterPanel: React.FC = () => {
 			? filters.sources.filter((s) => s !== source)
 			: [...filters.sources, source];
 
+		dispatch(clearArticlesCache());
 		dispatch(updateFilters({ sources: updatedSources }));
 	};
 
