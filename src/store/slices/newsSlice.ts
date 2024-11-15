@@ -1,5 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Article, NewsFilters } from '../../api/types';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import {
+   fetchNewsAPIArticles,
+   fetchGuardianArticles,
+   fetchNYTimesArticles
+} from '../../api/newsServices';
+import { RootState } from 'store/store';
 
 interface NewsState {
    articles: Article[];
@@ -51,5 +58,32 @@ export const {
    updateFilters,
    clearFilters
 } = newsSlice.actions;
+
+export const fetchArticles = createAsyncThunk(
+   'news/fetchArticles',
+   async (_, { getState, rejectWithValue }) => {
+      try {
+         const { news } = getState() as RootState;
+         const { searchQuery, sources } = news.filters;
+
+         const promises = [];
+
+         if (sources.includes('NewsAPI')) {
+            promises.push(fetchNewsAPIArticles(searchQuery));
+         }
+         if (sources.includes('The Guardian')) {
+            promises.push(fetchGuardianArticles(searchQuery));
+         }
+         if (sources.includes('New York Times')) {
+            promises.push(fetchNYTimesArticles(searchQuery));
+         }
+
+         const results = await Promise.all(promises);
+         return results.flat();
+      } catch (error) {
+         return rejectWithValue((error as Error).message);
+      }
+   }
+);
 
 export default newsSlice.reducer;
