@@ -5,6 +5,7 @@ import {
 	updateFilters,
 	clearArticlesCache,
 	fetchArticles,
+	clearFilters,
 } from "store/slices/newsSlice";
 import { useAppDispatch } from "store/store";
 import "./filterPanel.scss";
@@ -48,9 +49,26 @@ const FilterPanel: React.FC = () => {
 		await dispatch(fetchArticles());
 	};
 
+	const handleResetFilters = async () => {
+		dispatch(clearArticlesCache());
+		dispatch(clearFilters());
+		await dispatch(fetchArticles());
+	};
+
 	return (
 		<div className="filter-panel">
-			<h2>Filters</h2>
+			<div className="filter-header">
+				<h2>Filters</h2>
+				<button
+					className="reset-button"
+					onClick={handleResetFilters}
+					disabled={
+						filters.categories.length === 0 && filters.sources.length === 1
+					}
+				>
+					Reset
+				</button>
+			</div>
 
 			<section className="filter-section">
 				<h3>Categories</h3>
