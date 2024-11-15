@@ -1,46 +1,113 @@
-# Getting Started with Create React App
+# News Aggregator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern news aggregation application built with React, TypeScript, and Redux Toolkit that combines articles from multiple news sources including NewsAPI, The Guardian, and The New York Times.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- 🔍 Real-time news search across multiple sources
+- 🎨 Light/Dark theme support
+- 📱 Responsive design for all devices
+- 🔧 Advanced filtering options:
+  - Filter by news source
+  - Filter by category
+  - Search functionality
+- 📄 Infinite scroll pagination
+- 💾 Persistent user preferences
+- ⚡ Fast and optimized performance
+- 🛡️ Error boundary protection
+- 🎯 Type-safe development with TypeScript
 
-### `npm start`
+## Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Before running this project, make sure you have:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Node.js (v16 or later)
+- npm or yarn
+- API keys for:
+  - NewsAPI
+  - The Guardian API
+  - New York Times API
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
 
-### `npm run build`
+```bash
+git clone https://github.com/salmandotweb/news-aggregator.git
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+cd news-aggregator
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Install dependencies:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm install
+```
 
-### `npm run eject`
+3. Create a `.env` file in the root directory with your API keys:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+REACT_APP_NEWS_API_KEY=your_newsapi_key
+REACT_APP_GUARDIAN_API_KEY=your_guardian_key
+REACT_APP_NYTIMES_API_KEY=your_nytimes_key
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Start the development server:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+npm start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Docker Support
 
-## Learn More
+The application can also be run using Docker:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Build the Docker image:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+docker build -t news-aggregator .
+```
+
+2. Run the Docker container:
+
+```bash
+docker run -p 3000:3000 \
+-e REACT_APP_NEWS_API_KEY=your_key \
+-e REACT_APP_GUARDIAN_API_KEY=your_key \
+-e REACT_APP_NYTIMES_API_KEY=your_key \
+news-aggregator
+```
+
+Alternatively, use Docker Compose:
+
+```bash
+docker-compose up
+```
+
+## Project Structure
+
+├── src/
+│ ├── api/ # API services and types
+│ ├── components/ # React components
+│ ├── hooks/ # Custom React hooks
+│ ├── store/ # Redux store configuration
+│ │ └── slices/ # Redux slices
+│ └── styles/ # SCSS styles
+├── public/ # Static files
+└── ...configuration files
+
+## Tech Stack
+
+- React 18
+- TypeScript
+- Redux Toolkit
+- SASS/SCSS
+- Axios
+- date-fns
+- Docker
+
+## Acknowledgments
+
+- [NewsAPI](https://newsapi.org/)
+- [The Guardian API](https://open-platform.theguardian.com/)
+- [The New York Times API](https://developer.nytimes.com/)
