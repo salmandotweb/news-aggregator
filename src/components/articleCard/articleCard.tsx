@@ -18,13 +18,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
 				/>
 			)}
 			<div className="article-content">
-				<h2 className="article-title">
-					<a href={article.url} target="_blank" rel="noopener noreferrer">
-						{article.title}
-					</a>
-				</h2>
+				<div className="article-header">
+					<h2 className="article-title">
+						<a href={article.url} target="_blank" rel="noopener noreferrer">
+							{article.title}
+						</a>
+					</h2>
+					<span className="article-source">{article.source}</span>
+				</div>
 				<p className="article-meta">
-					{article.source} •{" "}
 					{format(new Date(article.publishedAt), "MMM d, yyyy")}
 					{article.author && ` • By ${article.author}`}
 				</p>

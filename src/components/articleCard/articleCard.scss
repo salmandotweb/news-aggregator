@@ -29,10 +29,27 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+
+		.article-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 1rem;
+		}
+
+		.article-source {
+			font-size: 0.85rem;
+			color: $primary-color;
+			background-color: rgba($primary-color, 0.1);
+			padding: 0.25rem 0.5rem;
+			border-radius: 4px;
+			white-space: nowrap;
+		}
 	}
 
 	.article-title {
 		font-size: 1.25rem;
+		flex: 1;
 
 		a {
 			color: $text-color;

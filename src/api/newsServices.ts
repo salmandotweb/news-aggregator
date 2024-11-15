@@ -31,7 +31,7 @@ export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<New
             id: article.url,
             title: article.title,
             description: article.description || '',
-            source: article.source.name,
+            source: 'NewsAPI',
             author: article.author || undefined,
             publishedAt: article.publishedAt,
             url: article.url,
@@ -52,8 +52,12 @@ export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<New
 export const fetchGuardianArticles = async (query: string): Promise<Article[]> => {
    try {
       const response = await axios.get<GuardianResponse>(
-         `https://content.guardianapis.com/search?q=${query}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText`
+         `https://content.guardianapis.com/search?q=${query}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`
       );
+
+      if (response.data.response.status !== 'ok') {
+         throw new Error('Guardian API response not ok');
+      }
 
       return response.data.response.results.map(article => ({
          id: article.id,
@@ -64,9 +68,10 @@ export const fetchGuardianArticles = async (query: string): Promise<Article[]> =
          publishedAt: article.webPublicationDate,
          url: article.webUrl,
          imageUrl: article.fields?.thumbnail,
-         category: undefined
+         category: article.sectionName
       }));
    } catch (error) {
+      console.error('Guardian API Error:', error);
       throw new Error('Failed to fetch from Guardian API');
    }
 };
