@@ -1,7 +1,12 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "store/store";
-import { updateFilters, clearArticlesCache } from "store/slices/newsSlice";
+import {
+	updateFilters,
+	clearArticlesCache,
+	fetchArticles,
+} from "store/slices/newsSlice";
+import { useAppDispatch } from "store/store";
 import "./filterPanel.scss";
 
 const CATEGORIES = [
@@ -16,25 +21,31 @@ const CATEGORIES = [
 const SOURCES = ["NewsAPI", "The Guardian", "New York Times"];
 
 const FilterPanel: React.FC = () => {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const filters = useSelector((state: RootState) => state.news.filters);
 
-	const handleCategoryChange = (category: string) => {
+	const handleCategoryChange = async (category: string) => {
 		const updatedCategories = filters.categories.includes(category)
 			? filters.categories.filter((c) => c !== category)
-			: [...filters.categories, category];
+			: [category];
 
 		dispatch(clearArticlesCache());
 		dispatch(updateFilters({ categories: updatedCategories }));
+		await dispatch(fetchArticles());
 	};
 
-	const handleSourceChange = (source: string) => {
+	const handleSourceChange = async (source: string) => {
 		const updatedSources = filters.sources.includes(source)
 			? filters.sources.filter((s) => s !== source)
 			: [...filters.sources, source];
 
+		if (updatedSources.length === 0) {
+			return;
+		}
+
 		dispatch(clearArticlesCache());
 		dispatch(updateFilters({ sources: updatedSources }));
+		await dispatch(fetchArticles());
 	};
 
 	return (

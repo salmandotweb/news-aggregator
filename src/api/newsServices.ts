@@ -12,11 +12,15 @@ export interface NewsAPIResult {
    totalResults: number;
 }
 
-export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<NewsAPIResult> => {
+export const fetchNewsAPIArticles = async (
+   query: string,
+   page: number,
+   category?: string
+): Promise<{ articles: Article[]; totalResults: number }> => {
    try {
       const endpoint = query
          ? `https://newsapi.org/v2/everything?q=${query}&pageSize=${ARTICLES_PER_PAGE}&page=${page}&apiKey=${NEWS_API_KEY}`
-         : `https://newsapi.org/v2/top-headlines?country=us&pageSize=${ARTICLES_PER_PAGE}&page=${page}&apiKey=${NEWS_API_KEY}`;
+         : `https://newsapi.org/v2/top-headlines?country=us${category ? `&category=${category}` : ''}&pageSize=${ARTICLES_PER_PAGE}&page=${page}&apiKey=${NEWS_API_KEY}`;
 
       const response = await axios.get<NewsAPIResponse>(endpoint);
 
@@ -36,7 +40,7 @@ export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<New
             publishedAt: article.publishedAt,
             url: article.url,
             imageUrl: article.urlToImage || undefined,
-            category: undefined
+            category: category ? category.charAt(0).toUpperCase() + category.slice(1) : undefined
          }));
 
       return {
@@ -49,11 +53,12 @@ export const fetchNewsAPIArticles = async (query: string, page = 1): Promise<New
    }
 };
 
-export const fetchGuardianArticles = async (query: string): Promise<Article[]> => {
+export const fetchGuardianArticles = async (
+   query: string,
+   category?: string
+): Promise<Article[]> => {
    try {
-      const endpoint = query
-         ? `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`
-         : `https://content.guardianapis.com/search?api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`;
+      const endpoint = `https://content.guardianapis.com/search?q=${encodeURIComponent(query)}${category ? `&section=${category}` : ''}&api-key=${GUARDIAN_API_KEY}&show-fields=thumbnail,bodyText,headline&page-size=10&order-by=newest`;
 
       const response = await axios.get<GuardianResponse>(endpoint);
 
@@ -78,11 +83,13 @@ export const fetchGuardianArticles = async (query: string): Promise<Article[]> =
    }
 };
 
-export const fetchNYTimesArticles = async (query: string): Promise<Article[]> => {
+export const fetchNYTimesArticles = async (
+   query: string,
+   category?: string
+): Promise<Article[]> => {
    try {
-      const endpoint = query
-         ? `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(query)}&api-key=${NYTIMES_API_KEY}`
-         : `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${NYTIMES_API_KEY}`;
+      const endpoint =
+         `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${encodeURIComponent(query)}${category ? `&fq=news_desk:(${category})` : ''}&api-key=${NYTIMES_API_KEY}`
 
       const response = await axios.get<NYTimesResponse>(endpoint);
 

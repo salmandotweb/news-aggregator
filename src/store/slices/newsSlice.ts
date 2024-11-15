@@ -110,18 +110,27 @@ export const fetchArticles = createAsyncThunk(
          dispatch(setLoading(true));
          dispatch(setError(null));
 
-         const { searchQuery, sources } = news.filters;
+         const { searchQuery, sources, categories } = news.filters;
          let articles: Article[] = [];
          let totalResults = 0;
 
+         const selectedCategory = categories.length > 0 ? categories[categories.length - 1].toLowerCase() : undefined;
+
          if (sources.includes('NewsAPI')) {
-            const newsAPIResult = await fetchNewsAPIArticles(searchQuery, currentPage);
+            const newsAPIResult = await fetchNewsAPIArticles(
+               searchQuery,
+               currentPage,
+               selectedCategory
+            );
             articles = newsAPIResult.articles;
             totalResults = newsAPIResult.totalResults;
          }
 
          if (sources.includes('The Guardian')) {
-            const guardianArticles = await fetchGuardianArticles(searchQuery);
+            const guardianArticles = await fetchGuardianArticles(
+               searchQuery,
+               selectedCategory
+            );
             articles = sources.includes('NewsAPI') ? [...articles, ...guardianArticles] : guardianArticles;
             if (!sources.includes('NewsAPI')) {
                totalResults = guardianArticles.length;
@@ -129,13 +138,24 @@ export const fetchArticles = createAsyncThunk(
          }
 
          if (sources.includes('New York Times')) {
-            const nyTimesArticles = await fetchNYTimesArticles(searchQuery);
+            const nyTimesArticles = await fetchNYTimesArticles(
+               searchQuery,
+               selectedCategory
+            );
             articles = sources.includes('NewsAPI') || sources.includes('The Guardian')
                ? [...articles, ...nyTimesArticles]
                : nyTimesArticles;
             if (!sources.includes('NewsAPI') && !sources.includes('The Guardian')) {
                totalResults = nyTimesArticles.length;
             }
+         }
+
+         if (categories.length > 0) {
+            articles = articles.filter(article =>
+               article.category && categories.some(cat =>
+                  cat.toLowerCase() === article.category?.toLowerCase()
+               )
+            );
          }
 
          if (articles.length === 0) {
