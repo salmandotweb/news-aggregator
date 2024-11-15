@@ -17,8 +17,9 @@ const App: React.FC = () => {
 	const { loading, error } = useSelector((state: RootState) => state.news);
 
 	useEffect(() => {
-		// Fetch articles when the app loads
+		const controller = new AbortController();
 		dispatch(fetchArticles());
+		return () => controller.abort();
 	}, [dispatch]);
 
 	return (

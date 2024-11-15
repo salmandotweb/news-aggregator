@@ -2,12 +2,51 @@
 @import "../../styles/mixins";
 
 .news-feed {
-	display: grid;
-	gap: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+
+	.articles-grid {
+		display: grid;
+		gap: 1.5rem;
+	}
 
 	.no-articles {
 		text-align: center;
 		color: $secondary-color;
 		padding: 2rem;
+	}
+
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 1rem;
+		margin-top: 2rem;
+		padding: 1rem;
+
+		.pagination-button {
+			padding: 0.5rem 1rem;
+			border: 1px solid $border-color;
+			border-radius: 4px;
+			background-color: white;
+			cursor: pointer;
+			transition: all 0.2s;
+
+			&:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			&:hover:not(:disabled) {
+				background-color: $primary-color;
+				color: white;
+			}
+		}
+
+		.page-number {
+			font-weight: 500;
+			color: $secondary-color;
+		}
 	}
 }
