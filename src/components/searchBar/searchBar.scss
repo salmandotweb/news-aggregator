@@ -3,7 +3,10 @@
 
 .search-bar {
 	width: 100%;
-	max-width: 500px;
+
+	@include respond-to("md") {
+		max-width: 500px;
+	}
 
 	.search-input-wrapper {
 		display: flex;
@@ -22,8 +25,8 @@
 
 	.search-input {
 		flex: 1;
-		padding: 0.875rem 1.5rem;
-		font-size: 0.95rem;
+		padding: 0.75rem 1rem;
+		font-size: 0.9rem;
 		border: none;
 		outline: none;
 		background-color: transparent;
@@ -33,13 +36,18 @@
 			color: var(--text-color);
 			opacity: 0.5;
 		}
+
+		@include respond-to("sm") {
+			padding: 0.875rem 1.5rem;
+			font-size: 0.95rem;
+		}
 	}
 
 	.search-button {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0.875rem 1.5rem;
+		padding: 0.75rem 1rem;
 		background-color: $primary-color;
 		border: none;
 		border-radius: 0 9999px 9999px 0;
@@ -56,8 +64,17 @@
 		}
 
 		svg {
-			width: 20px;
-			height: 20px;
+			width: 18px;
+			height: 18px;
+
+			@include respond-to("sm") {
+				width: 20px;
+				height: 20px;
+			}
+		}
+
+		@include respond-to("sm") {
+			padding: 0.875rem 1.5rem;
 		}
 	}
 }

@@ -30,11 +30,7 @@ const App: React.FC = () => {
 						<h1>
 							News<span>Aggregator</span>
 						</h1>
-					</div>
 
-					<SearchBar />
-
-					<div className="header-actions">
 						<button
 							className="theme-toggle"
 							onClick={toggleTheme}
@@ -43,6 +39,8 @@ const App: React.FC = () => {
 							{theme === "light" ? "🌙" : "☀️"}
 						</button>
 					</div>
+
+					<SearchBar />
 				</div>
 			</header>
 

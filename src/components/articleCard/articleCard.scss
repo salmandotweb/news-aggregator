@@ -4,11 +4,16 @@
 .article-card {
 	display: grid;
 	gap: 1rem;
-	padding: 1.25rem;
-	border-radius: 1rem;
+	padding: 1rem;
+	border-radius: 0.75rem;
 	background: var(--card-bg);
 	border: 1px solid var(--border-color);
 	transition: all 0.2s;
+
+	@include respond-to("sm") {
+		padding: 1.25rem;
+		border-radius: 1rem;
+	}
 
 	@include respond-to("md") {
 		grid-template-columns: 240px 1fr;
@@ -21,9 +26,13 @@
 
 	.article-image {
 		width: 100%;
-		height: 200px;
+		height: 180px;
 		object-fit: cover;
 		border-radius: 0.75rem;
+
+		@include respond-to("sm") {
+			height: 200px;
+		}
 	}
 
 	.article-content {
@@ -33,9 +42,15 @@
 
 		.article-header {
 			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			gap: 0.75rem;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			@include respond-to("sm") {
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: flex-start;
+				gap: 0.75rem;
+			}
 		}
 
 		.article-source {
@@ -50,7 +65,7 @@
 	}
 
 	.article-title {
-		font-size: 1.25rem;
+		font-size: 1.1rem;
 		font-weight: 600;
 		line-height: 1.4;
 		flex: 1;
@@ -65,6 +80,10 @@
 				color: $primary-color;
 			}
 		}
+
+		@include respond-to("sm") {
+			font-size: 1.25rem;
+		}
 	}
 
 	.article-meta {
@@ -77,5 +96,13 @@
 		color: var(--text-color);
 		line-height: 1.6;
 		opacity: 0.9;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+
+		@include respond-to("md") {
+			-webkit-line-clamp: 4;
+		}
 	}
 }
