@@ -70,12 +70,10 @@ export interface GuardianResponse {
    };
 }
 
-// First, let's create a base interface for the common properties
 interface NYTimesResponseBase {
    status: string;
 }
 
-// Interface for article search response
 export interface NYTimesArticleSearchResponse extends NYTimesResponseBase {
    response: {
       docs: Array<{

@@ -28,7 +28,7 @@ const initialState: NewsState = {
       startDate: undefined,
       endDate: undefined,
       categories: [],
-      sources: ['NewsAPI'],
+      sources: ['The Guardian'],
       authors: []
    },
    currentPage: 1,
