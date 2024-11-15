@@ -86,15 +86,17 @@ docker-compose up
 
 ## Project Structure
 
-├── src/
-│ ├── api/ # API services and types
-│ ├── components/ # React components
-│ ├── hooks/ # Custom React hooks
-│ ├── store/ # Redux store configuration
-│ │ └── slices/ # Redux slices
-│ └── styles/ # SCSS styles
-├── public/ # Static files
+```
+src/
+├── api/            # API services and types
+├── components/     # React components
+├── hooks/          # Custom React hooks
+├── store/          # Redux store configuration
+│   └── slices/     # Redux slices
+└── styles/         # SCSS styles
+public/            # Static files
 └── ...configuration files
+```
 
 ## Tech Stack
 
